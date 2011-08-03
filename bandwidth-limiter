@@ -1,0 +1,55 @@
+#!/usr/bin/python 
+
+import sys
+import subprocess
+
+from optparse import OptionParser
+
+def execute_cmds(cmds, line_break=False):
+    for cmd in cmds:
+        split_cmd = cmd.split(" ")
+        subprocess.call(split_cmd)
+        if line_break: print("------------------------------------")
+
+def show_bandwidth_limits():
+    cmds = ["ipfw list",
+           "ipfw pipe list"]
+    execute_cmds(cmds, line_break=True)
+
+def start_bandwidth_limits(bw="64Kbit/s", q="10Kbytes"):
+    cmds = ["ipfw add pipe 1 ip from any to any out",
+           "ipfw add pipe 2 ip from any to any in",
+           "ipfw pipe 1 config bw %s queue %s" % (bw, q),
+           "ipfw pipe 2 config bw %s queue %s" % (bw, q)]
+    execute_cmds(cmds)
+
+def stop_bandwidth_limits():
+    cmds = ["ipfw -q flush",
+           "ipfw pipe 1 delete",
+           "ipfw pipe 2 delete"]
+    execute_cmds(cmds)
+
+if __name__ == "__main__":
+    parser = OptionParser()
+    parser.add_option("--start", dest="start", help="turn on bandwidth limits", action="store_true")
+    parser.add_option("--stop", dest="stop", help="turn off bandwidth limits", action="store_true")
+    parser.add_option("--list", dest="list", help="list current status", action="store_true")
+    (options, args) = parser.parse_args()
+
+    if options.start and options.stop:
+        print("You cannot start and stop bandwidth limits at the same time")
+        sys.exit(1)
+    elif options.list:
+        print("Showing current state of bandwidth limits")
+        print("=========================================")
+        show_bandwidth_limits()
+    elif options.start:
+        start_bandwidth_limits()
+    elif options.stop:
+        stop_bandwidth_limits()
+    else:
+        print("You must pick one option")
+        print("=========================================")
+        parser.print_help()
+        sys.exit(1)
+

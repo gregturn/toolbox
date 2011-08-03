@@ -55,8 +55,8 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("--start", dest="start", help="turn on bandwidth limits", action="store_true")
     parser.add_option("--stop", dest="stop", help="turn off bandwidth limits", action="store_true")
-    parser.add_option("--bandwidth", dest="bw", help="specify bandwidth, measured in [K|M]{bit/s|Byte/s}", action="store")
-    parser.add_option("--queue", dest="q", help="queue {slots | sizeKbytes}", action="store")
+    parser.add_option("--bandwidth", dest="bw", help="specify bandwidth, measured in [K|M]{bit/s|Byte/s} (defaults to 64Kbit/sec)", action="store")
+    parser.add_option("--queue", dest="q", help="queue {slots | sizeKbytes} (defaults to 10Kbytes)", action="store")
     parser.add_option("--list", dest="list", help="list current status", action="store_true")
     (options, args) = parser.parse_args()
 

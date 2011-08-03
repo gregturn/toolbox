@@ -21,7 +21,6 @@ This script is used to turn on/off bandwidth limits to simulate running on a slo
 So far, it only works on Mac OSX.
 """
 
-import sys
 import subprocess
 
 from optparse import OptionParser
@@ -61,8 +60,7 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     if options.start and options.stop:
-        print("You cannot start and stop bandwidth limits at the same time")
-        sys.exit(1)
+        parser.error("--start and --stop are mutually exclusive")
     elif options.list:
         print("Showing current state of bandwidth limits")
         print("=========================================")
@@ -76,8 +74,5 @@ if __name__ == "__main__":
     elif options.stop:
         stop_bandwidth_limits()
     else:
-        print("You must pick one option")
-        print("=========================================")
-        parser.print_help()
-        sys.exit(1)
+        parser.error("You didn't pick --start, --stop, --list, or --help")
 

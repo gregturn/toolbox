@@ -37,11 +37,14 @@ def show_bandwidth_limits():
            "ipfw pipe list"]
     execute_cmds(cmds, line_break=True)
 
-def start_bandwidth_limits(bw="64Kbit/s", q="10Kbytes"):
+def start_bandwidth_limits(bw="64Kbit/s", q="10Kbytes", port=None):
     cmds = ["ipfw add pipe 1 ip from any to any out",
            "ipfw add pipe 2 ip from any to any in",
            "ipfw pipe 1 config bw %s queue %s" % (bw, q),
            "ipfw pipe 2 config bw %s queue %s" % (bw, q)]
+    if port:
+        cmds[0] = "ipfw add pipe 1 ip from any to any %s out" % port
+        cmds[1] = "ipfw add pipe 2 ip from any to any %s out" % port
     execute_cmds(cmds)
 
 def stop_bandwidth_limits():
@@ -57,6 +60,7 @@ if __name__ == "__main__":
     parser.add_option("--bandwidth", dest="bw", help="specify bandwidth, measured in [K|M]{bit/s|Byte/s} (default: %default)", action="store", default="256Kbit/sec")
     parser.add_option("--queue", dest="q", help="queue {slots | sizeKbytes} (default: %default)", action="store", default="10Kbytes")
     parser.add_option("--list", dest="list", help="list current status", action="store_true")
+    parser.add_option("--port", dest="port", help="only apply to a single port", action="store")
     (options, args) = parser.parse_args()
 
     if options.start and options.stop:
@@ -66,7 +70,10 @@ if __name__ == "__main__":
         print("=========================================")
         show_bandwidth_limits()
     elif options.start:
-        start_bandwidth_limits(options.bw, options.q)
+        if options.port:
+            start_bandwidth_limits(options.bw, options.q, options.port)
+        else:
+            start_bandwidth_limits(options.bw, options.q)
     elif options.stop:
         stop_bandwidth_limits()
     else:

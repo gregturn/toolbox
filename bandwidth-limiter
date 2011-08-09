@@ -26,6 +26,8 @@ import subprocess
 from optparse import OptionParser
 
 def execute_cmds(cmds, line_break=False):
+    "Convert an array of string commands into a callable set of commands"
+
     for cmd in cmds:
         split_cmd = cmd.split(" ")
         #print(split_cmd)  # Useful for debugging the commands
@@ -33,27 +35,35 @@ def execute_cmds(cmds, line_break=False):
         if line_break: print("------------------------------------")
 
 def show_bandwidth_limits():
+    "List the ipfw settings as well as the pipes."
+
     cmds = ["ipfw list",
            "ipfw pipe list"]
     execute_cmds(cmds, line_break=True)
 
 def start_bandwidth_limits(bw="64Kbit/s", q="10Kbytes", port=None):
+    "Turn on the ipfw bandwidth limits."
+
     cmds = ["ipfw add pipe 1 ip from any to any out",
            "ipfw add pipe 2 ip from any to any in",
            "ipfw pipe 1 config bw %s queue %s" % (bw, q),
            "ipfw pipe 2 config bw %s queue %s" % (bw, q)]
-    if port:
+    if port: # if the port option is specified, replace the pipe commands with port specifics
         cmds[0] = "ipfw add pipe 1 ip from any to any %s out" % port
         cmds[1] = "ipfw add pipe 2 ip from any to any %s out" % port
     execute_cmds(cmds)
 
 def stop_bandwidth_limits():
+    "Flush the rules and delete the pipes."
+
     cmds = ["ipfw -q flush",
            "ipfw pipe 1 delete",
            "ipfw pipe 2 delete"]
     execute_cmds(cmds)
 
 if __name__ == "__main__":
+    "Setup an option parser to execute the commands."
+
     parser = OptionParser()
     parser.add_option("--start", dest="start", help="turn on bandwidth limits", action="store_true")
     parser.add_option("--stop", dest="stop", help="turn off bandwidth limits", action="store_true")

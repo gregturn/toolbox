@@ -21,7 +21,9 @@ This script is used to turn on/off bandwidth limits to simulate running on a slo
 So far, it only works on Mac OSX.
 """
 
+import os.path
 import subprocess
+import sys
 
 from optparse import OptionParser
 
@@ -63,6 +65,12 @@ def stop_bandwidth_limits():
 
 if __name__ == "__main__":
     "Setup an option parser to execute the commands."
+
+    # Institute a basic check over what platforms are supported by this tool
+    supported = ["darwin"]
+    if len([platform for platform in supported if platform in sys.platform]) == 0:
+        print("Platform %s is not supported by %s" % (sys.platform, os.path.basename(sys.argv[0])))
+        sys.exit(1)
 
     parser = OptionParser()
     parser.add_option("--start", dest="start", help="turn on bandwidth limits", action="store_true")

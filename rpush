@@ -36,7 +36,7 @@
 #
 ############################################################################
 
-rsync --dry-run -avz --delete --progress $1 $2:
+rsync -avz --delete --progress $1 $2:
 
 ############################################################################
 # Q: Why not use some version control system like git? It works great at

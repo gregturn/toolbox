@@ -1,0 +1,22 @@
+#!/usr/bin/python
+
+import sys
+import os
+
+def java_check(filename):
+    file_prefix = filename.split(".class")[0]
+    print("Running javap %s" % file_prefix)
+    os.system("javap -verbose %s" % file_prefix)
+    
+
+if len(sys.argv) > 1:
+    for filename in sys.argv[1:]:
+
+        if filename.endswith(".class"):
+            java_check(filename)
+        else:
+            print("We only look at files ending in .class")
+
+
+else:
+    print("No files to process")
